@@ -1,0 +1,71 @@
+Updates for Fish Game
+
+Priority
+- Local High Score saves with initials
+    - In order to do this, I will apparently have to more or less just completely rewrite how the code works which on one hand should allow it to work better but on the other, I'm tired and don't want to right now
+- Exit button on reset screen   [args.gtk.request_quit]
+- Exit button on start screen   [args.gtk.request_quit]
+- Stop the lines from going over the reset screen
+- Remove player movement on reset screen (possibly)
+- Sounds [Button click, transition sound, timers]
+
+Things to Work On
+- Multiple game modes [Classic, Points Race, Flying Fish, Endless Mode ?]
+- Power ups
+- Fish Flurry after x points for a period of time (8 extra seconds)
+- Easter eggs
+- COLORS FOR PHISH
+- Rod customization (ie color change)
+- SKO BUFFS ENDING
+- Update start screen
+- Include images a/o animations to tutorial page
+
+
+Completed
+- Start button that actually works and is not the entire screen [Still buggy]
+- Separate tutorial screen
+- Slightly increased fish spawns
+
+
+
+
+
+
+
+
+# Defines the game.
+def game
+  @game
+end
+
+# Sets the value of the game state provider.
+def initialize game_state_provider
+  @game_state_provider = game_state_provider
+end
+
+# Defines the game state.
+# Any variable prefixed with an @ symbol is an instance variable.
+def state
+  @game_state_provider.state
+end
+
+# Saves the state of the game in a text file called game_state.txt.
+def save
+  $gtk.serialize_state('game_state.txt', state)
+end
+
+
+# Loads the game state from the game_state.txt text file.
+# If the load is unsuccessful, the user is informed since the story line indicates the failure.
+def load
+  parsed_state = $gtk.deserialize_state('game_state.txt')
+  if !parsed_state
+    set_story_line "no game to load. press save first."
+  else
+    $gtk.args.state = parsed_state
+  end
+end
+
+
+
+  args.state.credits_button   ||= new_button :credits, 1190, 620, 70, 70, 250, 250, 174
