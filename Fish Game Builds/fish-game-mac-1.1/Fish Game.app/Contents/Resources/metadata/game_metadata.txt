@@ -1,0 +1,12 @@
+devid=Mistress Of Universes
+devtitle=Mistress Of Universes
+gameid=fish-game
+gametitle=Fish Game
+version=1.1
+icon=metadata/fishicon.png
+
+# Uncomment the entry below to bytecode compile your Ruby code (Pro License Only)
+#compile_ruby=false
+
+# Uncomment the entry below to specify the package name for your APK (Pro License Only)
+#packageid=org.dev.gamename

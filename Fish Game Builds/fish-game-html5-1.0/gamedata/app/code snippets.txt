@@ -1,0 +1,390 @@
+=begin
+LAST WORKING VARIENT OF CODE
+
+=end
+
+# Runs methods needed for game to run properly.
+def tick args
+  defaults args
+  render args
+  calc args
+end
+
+
+def defaults args
+  # boat
+  args.state.boat = [10,300, 200, 50, 161, 122, 116]  # boat
+
+  # player
+  args.state.player.x ||= 270
+  args.state.player.y ||= 350
+  args.state.player.size = 20
+  args.state.player_dx ||= []
+  args.state.player_dy ||= []
+  
+  # fish
+  args.state.fish.x ||= 70
+  args.state.fish.y ||= 84
+  args.state.fish_speed = 2
+  args.state.fish_size = 50
+  args.state.fish_dx ||= 1
+  args.state.fish_dy ||= 0.25
+
+
+  args.state.fish_collision ||= false
+  args.state.boat_collision ||= false
+  
+end
+
+def render args
+  # screen setup
+  # background
+  args.outputs.solids << [0, 0, 1282, 300, 0, 70, 250, 70]
+  args.outputs.solids << [10,300, 200, 50, 161, 122, 116]
+  
+  # misc
+  # fishing rod
+  args.outputs.lines  << [180, 350, 270, 580]
+  # fishing line
+  args.outputs.lines << [270, 580, args.state.player.x + 10,args.state.player.y + 10]
+
+  # player
+  args.outputs.sprites << [args.state.player.x, args.state.player.y, args.state.player.size, args.state.player.size, '/sprites/hexagon/grey.png']
+
+  # sprites
+  if args.state.fish_collision == true
+    args.outputs.sprites << [args.state.fish.x, args.state.fish.y, args.state.fish_size, args.state.fish_size, '/sprites/misc/lowrez-ship-red.png', 270  * args.state.fish_dx]
+  else
+    args.outputs.sprites << [args.state.fish.x, args.state.fish.y, args.state.fish_size, args.state.fish_size, '/sprites/misc/lowrez-ship-blue.png', 270  * args.state.fish_dx]
+  end
+
+end
+
+def calc args
+  args.state.player.rect = [args.state.player.x, args.state.player.y, args.state.player.size, args.state.player.size]
+  args.state.fish.rect = [args.state.fish.x, args.state.fish.y, args.state.fish_size, args.state.fish_size]
+  collision_check args
+  fish_movement args
+  player_movement args
+
+end
+
+# Fish
+def fish_movement args
+  screen_width  = 1280
+  screen_height = 720
+
+  args.state.fish.x += args.state.fish_speed * args.state.fish_dx;
+  args.state.fish.y += args.state.fish_speed * args.state.fish_dy;
+
+  # x-movement
+  if args.state.fish.x > screen_width - args.state.fish_size
+    args.state.fish_dx = -1 # move L
+  elsif args.state.fish.x < 0
+    args.state.fish_dx =  1 # move R
+  end
+  # y-movement
+  if args.state.fish.y > 250 - args.state.fish_size
+    args.state.fish_dy = -0.25 # move v
+  elsif args.state.fish.y < 10
+    args.state.fish_dy =  0.25 # move ^
+  end
+
+end
+
+# Player
+def player_movement args
+  # playscreen res : 1280x720
+  screen_width  = 1280
+  screen_height = 720
+
+  # Player Movement
+  # x-movement
+  if args.inputs.left
+    args.state.player_dx = -3;
+  elsif args.inputs.right
+    args.state.player_dx = 3;
+  else
+    args.state.player_dx = 0;
+  end
+  # y-movement
+  if args.inputs.down
+    args.state.player_dy = -3;
+  elsif args.inputs.up
+    args.state.player_dy = 3;
+  else
+    args.state.player_dy = 0;
+  end
+
+  # Keeping player sprite within game window
+  # x-movement
+  if args.state.player.x + args.state.player_dx > screen_width - args.state.player.size
+    args.state.player_dx = 0 # dnmove
+  elsif args.state.player.x + args.state.player_dx < 0
+    args.state.player_dx =  0 # dnmove
+  end
+  # y-movement
+  if args.state.player.y + args.state.player_dy > screen_height - args.state.player.size
+    args.state.player_dy = 0 # dnmove
+  elsif args.state.player.y + args.state.player_dy < 0
+    args.state.player_dy =  0 # dnmove
+  end
+
+  args.state.player.x += args.state.player_dx;
+  args.state.player.y += args.state.player_dy;
+  
+end
+
+def collision_check args
+  # fish
+  if args.state.player.rect.intersect_rect? args.state.fish.rect # if the two boxes intersect
+    args.state.fish_collision = true # then a collision happened
+  else
+    args.state.fish_collision = false # otherwise, no collision happened
+  end
+
+  # boat
+  if args.state.player.rect.intersect_rect? args.state.boat
+    args.state.boat_collision = true
+  else
+    args.state.boat_collision = false
+  end
+
+end
+
+
+
+$gtk.reset
+
+
+
+# excess code
+
+
+
+
+
+~~~~~~~~ Most Recent Variation of the Code ~~~~~~~~~
+
+# Runs methods needed for game to run properly.
+def tick args
+  defaults args
+  render args
+  calc args
+end
+
+
+def defaults args
+  fishingBasic args
+  args.state.fish ||= []
+  args.state.fish.fish_ queue ||= []
+  args.state.tick_count = args.state.tick_count
+  args.state.boat = [10,300, 200, 50, 161, 122, 116]  # boat
+  args.state.player.x ||= 270                         # player
+  args.state.player.y ||= 350
+  args.state.player.dx ||= []
+  args.state.player.dy ||= []
+  args.state.fish.x ||= 70 
+  args.state.fish.y ||= 84
+  args.state.fish_speed ||= []
+  args.state.fish.dx ||= []
+  args.state.fish.dy ||= []
+  args.state.fish.scale = 4
+  args.state.fish_collision ||= false                 # collision
+  args.state.boat_collision ||= false
+  
+end
+
+def fishingBasic args
+  args.state.gravity                    = -0.3
+  args.state.fish_entry_interval        = 90      # sets fish values
+  args.state.max_fish_entry             = 10
+  args.state.gap_between_fish           = 15
+  args.state.fish_size                  = 32
+  args.state.min_fish_speed             = 1
+  args.state.max_fish_speed             = 4
+  args.state.max_fish_dx                = 3
+  args.state.max_fish_dy                = 1
+  args.state.player_max_drop_speed      = 10      # sets player values
+  args.state.player_speed_slowdown_rate = 1.3
+  args.state.player_acceleration        = 1
+  args.state.ocean_height               = 250 - args.state.fish_size  # sets ocean max height
+
+end
+
+
+def render args
+  # screen setup
+  # background
+  args.outputs.solids << [0, 0, 1282, 300, 0, 70, 250, 70]
+  args.outputs.solids << args.state.boat
+  
+  # misc
+  # fishing rod
+  args.outputs.lines  << [180, 350, 270, 580]
+  # fishing line
+  args.outputs.lines << [270, 580, args.state.player.x + 10,args.state.player.y + 10]
+
+  # sprites
+  # player
+  args.outputs.sprites << [args.state.player.x, args.state.player.y, args.state.player.size, args.state.player.size, '/sprites/hexagon/grey.png']
+
+  # fish
+  args.outputs.sprites << [args.state.fish, '/sprites/misc/lowrez-ship-red.png']
+
+end
+
+x
+
+=begin
+  I have absolutely no clue if this new fish code will work at all and I don't know what I'm going to do if it doesn't.
+
+=end
+
+# Fish
+def fish_movement args
+  screen_width  = 1280
+  screen_height = 720
+
+  # if 90 frames have passed or 5 frames have passed since the game ended
+  if args.state.tick_count.mod_zero?(args.state.fish_entry_interval)
+    # rand will return a number greater than or equal to 0 and less than given variable's value (since max is excluded)
+    # that is why we're adding 1, to include the max possibility
+    temp = rand(5) + 1
+    if temp < 3
+      swim_x   = (rand(screen_width) + 1)
+    else
+      swim_x   = (rand(screen_width) + 1 * -1)
+    end
+
+    temp = rand(5) + 1
+    if temp < 3
+      swim_y   = (rand(args.state.ocean_height) + 1)
+    else
+      swim_y   = (rand(args.state.ocean_height) + 1 * -1)
+    end
+
+    temp = rand(5) + 1
+    if temp < 3
+      swim_dx   = (rand(args.state.max_fish_dx) + 1)
+    else
+      swim_dx   = (rand(args.state.max_fish_dx) + 1 * -1)
+    end
+
+    temp = rand(5) + 1
+    if temp < 3
+      swim_dy   = (rand(args.state.max_fish_dy) + 0.25)
+    else
+      swim_dy   = (rand(args.state.max_fish_dy) + 0.25 * -1)
+    end
+
+    (rand(args.state.max_fish_entry) + 1).map_with_index do |i|
+      args.state.fish.fish_queue << { # stores fish values in a hash
+        x: swim_x,
+        y: swim_y,
+        w: args.state.fish_size,
+        h: args.state.fish_size,
+        dx: swim_dx,
+        dy: swim_dy,
+        # multiplication operator takes precedence over addition operator
+        release_at: args.state.tick_count + i * args.state.gap_between_fish
+      }
+    end
+  end
+
+  # add elements from fish_queue collection to the fish collection by
+  # finding all fish that were thrown before the current frame (have already been thrown)
+  args.state.fish += args.state.fish.fish_queue.find_all do |f|
+    f[:release_at] < args.state.tick_count
+  end
+
+  args.state.fish.each do |f| # sets values for all fish in collection
+    f[:w]    = args.state.fish_size
+    f[:h]    = args.state.fish_size
+    f[:x]  ||= args.state.fish.x
+    f[:x]    = -args.state.fish.size * args.state.fish.scale if args.state.fish.x - 20 > 1280
+    f[:x]    = 1280 if args.state.fish.x + args.state.fish.size * args.state.fish.scale + 20 < 0
+    f[:y]  ||= args.state.fish.y
+    f[:dx] ||= args.state.fish.dx
+    f[:dy] ||= args.state.fish.dy
+    f[:dy]   = f[:dy] * -1 if args.state.fish.y > 250 - args.state.fish.size
+    f[:dy]   = f[:dy] * -1 if args.state.fish.y + args.state.fish.size * args.state.fish.scale + 10 < 0
+    f[:x]   += f[:dx] # incremented by change in position
+    f[:y]   += f[:dy]
+    f[:rect] = [f[:x], f[:y], f[:w], f[:h]] # sets definition of fish's rect
+  end
+
+  # reject fish that have been thrown before current frame (have already been thrown)
+  args.state.fish.fish_queue = args.state.fish.fish_queue.reject do |f|
+    f[:release_at] < args.state.tick_count && (args.state.fish.x < 0 || args.state.fish.x > screen_width || args.state.fish.y < 0)
+  end
+
+end
+
+# Player
+def player_movement args
+  # playscreen res : 1280x720
+  screen_width  = 1280
+  screen_height = 720
+
+  # Player Movement
+  # x-movement
+  if args.inputs.left
+    args.state.player.dx = -3
+  elsif args.inputs.right
+    args.state.player.dx = 3
+  else
+    args.state.player.dx = 0
+  end
+  # y-movement
+  if args.inputs.down
+    args.state.player.dy = -3
+  elsif args.inputs.up
+    args.state.player.dy = 3
+  else
+    args.state.player.dy = 0
+  end
+
+  # Keeping player sprite within game window
+  # x-movement
+  if args.state.player.x + args.state.player.dx > screen_width - args.state.player.size
+    args.state.player.dx = 0 # dnmove
+  elsif args.state.player.x + args.state.player.dx < 0
+    args.state.player.dx =  0 # dnmove
+  end
+  # y-movement
+  if args.state.player.y + args.state.player.dy > screen_height - args.state.player.size
+    args.state.player.dy = 0 # dnmove
+  elsif args.state.player.y + args.state.player.dy < 0
+    args.state.player.dy =  0 # dnmove
+  elsif args.state.boat_collision
+    args.state.player.dy = 0
+  end
+
+  args.state.player.x += args.state.player.dx
+  args.state.player.y += args.state.player.dy
+  
+end
+
+def collision_check args
+  # fish
+  if args.state.player.rect.intersect_rect? args.state.fish.rect # if the two boxes intersect
+    args.state.fish_collision = true # then a collision happened
+  else
+    args.state.fish_collision = false # otherwise, no collision happened
+  end
+
+  # boat
+  if args.state.player.rect.intersect_rect? args.state.boat
+    args.state.boat_collision = true
+  else
+    args.state.boat_collision = false
+  end
+
+end
+
+$gtk.reset
+
+
+
+# excess code
